@@ -1,5 +1,5 @@
 import os
-import datetime
+from exif import Image
 
 path_in_dir = ''
 
@@ -17,9 +17,16 @@ for adress, dirs, files in os.walk(path_in_dir):
     for photo in files:
         if '.jpg' in photo or '.jpeg' in photo:
             full_path_photo = os.path.join(adress, photo)
-            full_date_photo = datetime.datetime.fromtimestamp(os.path.getmtime(full_path_photo))
-            # full_date_photo = os.path.getctime(full_path_photo)
-            print(full_path_photo, full_date_photo)
+            with open(full_path_photo, "rb") as palm_file:
+                images = Image(palm_file)
+            data_photo = images.datetime_original
+            year_photo = data_photo[0:4]
+            month_photo = data_photo[5:7]
+            print(year_photo, month_photo)
+            
+
+
+            # print(full_path_photo, full_date_photo)
         # if '_compressed' in file:
         #     full = os.path.join(adress, file)
         #     new_file = file.replace('_compressed', '')
