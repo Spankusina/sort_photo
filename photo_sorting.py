@@ -10,15 +10,16 @@ while os.path.exists(path_in_dir) == False:
 
 path_out_dir = input('Введите адрес папки, куда сложить фотографии: ')
 if os.path.exists(path_out_dir) == False:
-    os.mkdir(path_out_dir)
+    os.makedirs(path_out_dir)
 count = 0
 
 for adress, dirs, files in os.walk(path_in_dir):
     for photo in files:
         if '.jpg' in photo or '.jpeg' in photo:
             full_path_photo = os.path.join(adress, photo)
-            full_date_photo = datetime.datetime.fromtimestamp(os.path.getctime(full_path_photo))
-            print(full_date_photo)
+            full_date_photo = datetime.datetime.fromtimestamp(os.path.getmtime(full_path_photo))
+            # full_date_photo = os.path.getctime(full_path_photo)
+            print(full_path_photo, full_date_photo)
         # if '_compressed' in file:
         #     full = os.path.join(adress, file)
         #     new_file = file.replace('_compressed', '')
