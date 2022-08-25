@@ -1,5 +1,6 @@
 import os
 import datetime
+import hashlib 
 from exif import Image
 
 def md(path):
@@ -7,6 +8,7 @@ def md(path):
         os.makedirs(path)
 
 path_in_dir = ''
+hash_list = []
 
 while os.path.exists(path_in_dir) == False:
     path_in_dir = input('Введите адрес папки, откуда взять фотографии: ')
@@ -24,8 +26,13 @@ for adress, dirs, files in os.walk(path_in_dir):
             full_path_photo = os.path.join(adress, photo)
             print(full_path_photo)
             
-            with open(full_path_photo, "rb") as palm_file:
+            with open(full_path_photo, 'rb') as palm_file:
+                data = palm_file.read()
                 images = Image(palm_file)
+                
+            file_hash = hashlib.md5()
+            file_hash.update(data)
+            hash_list.append(file_hash.hexdigest())
 
             if images.has_exif:
                 data_photo = images.datetime_original
@@ -39,6 +46,7 @@ for adress, dirs, files in os.walk(path_in_dir):
                 else:
                     month_photo = str(data_photo.month)
             
+
             palm_file.close
 
             new_path_dir = os.path.join(path_out_dir, year_photo, month_photo)
@@ -46,13 +54,6 @@ for adress, dirs, files in os.walk(path_in_dir):
 
             md(new_path_dir)
 
-            
+        
+print(hash_list)
 
-
-            # print(full_path_photo, full_date_photo)
-        # if '_compressed' in file:
-        #     full = os.path.join(adress, file)
-        #     new_file = file.replace('_compressed', '')
-        #     new_full = os.path.join(adress, new_file)
-        #     os.rename(full, new_full)
-            count += 1
