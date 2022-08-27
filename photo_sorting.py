@@ -1,3 +1,4 @@
+from itertools import count
 import os
 import datetime
 import hashlib 
@@ -8,8 +9,18 @@ def md(path):
     if os.path.exists(path) == False:
         os.makedirs(path)
 
+def gettime():
+    data_photo = datetime.datetime.fromtimestamp(os.path.getmtime(full_path_photo))
+    year = str(data_photo.year)
+    if data_photo.month < 10:
+        month = '0' + str(data_photo.month)
+    else:
+        month = str(data_photo.month)
+    return year, month
+
 path_in_dir = ''
 hash_list = []
+count_move = 0
 
 while os.path.exists(path_in_dir) == False:
     path_in_dir = input('Введите адрес папки, откуда взять фотографии: ')
@@ -18,6 +29,11 @@ while os.path.exists(path_in_dir) == False:
 
 path_out_dir = input('Введите адрес папки, куда сложить фотографии: ')
 md(path_out_dir)
+
+log_full_path = os.path.join(path_out_dir, 'log.txt')
+log = open (log_full_path, 'a')
+log.write('------- Start in ' + str(datetime.datetime.now()) + '\n')
+
 
 #заносим хеш всех фотографий в конечной папке
 for adress, dirs, files in os.walk(path_out_dir):
@@ -47,18 +63,16 @@ for adress, dirs, files in os.walk(path_in_dir):
                 palm_file.seek(0,0)
                 images = Image(palm_file)
 
-          
+
             if images.has_exif:
-                data_photo = images.datetime_original
-                year_photo = data_photo[0:4]
-                month_photo = data_photo[5:7]
-            else:
-                data_photo = datetime.datetime.fromtimestamp(os.path.getmtime(full_path_photo))
-                year_photo = str(data_photo.year)
-                if data_photo.month < 10:
-                    month_photo = '0' + str(data_photo.month)
+                if images.get('datetime_original', default='none') != 'none':
+                    data_photo = images.datetime_original
+                    year_photo = data_photo[0:4]
+                    month_photo = data_photo[5:7]
                 else:
-                    month_photo = str(data_photo.month)
+                    year_photo, month_photo = gettime()        
+            else:
+                year_photo, month_photo = gettime()
 
             new_adress = os.path.join(path_out_dir, year_photo, month_photo)
             md(new_adress)
@@ -84,9 +98,14 @@ for adress, dirs, files in os.walk(path_in_dir):
 
                 new_name_photo = os.path.join(adress, photo)
                 os.rename(full_path_photo, new_name_photo)
+                log.write(full_path_photo + ' renamed in ' + new_name_photo + '\n')
                 full_path_photo = new_name_photo
             else:
                 hash_list.append(file_hash.hexdigest())
 
             shutil.move(full_path_photo, new_adress)
+            count_move +=1
+            log.write(full_path_photo + ' moved in ' + new_adress + '\n')
 
+log.write('Количество перенесенных файлов: ' + str(count_move) + '\n' + '------- Finish in ' + str(datetime.datetime.now()) + '\n')
+log.close()
