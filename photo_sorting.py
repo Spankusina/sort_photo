@@ -8,14 +8,18 @@ def md(path):
     if os.path.exists(path) == False:
         os.makedirs(path)
 
-def gettime():
+def no_exif(photo):
     data_photo = datetime.datetime.fromtimestamp(os.path.getmtime(full_path_photo))
     year = str(data_photo.year)
     if data_photo.month < 10:
         month = '0' + str(data_photo.month)
     else:
         month = str(data_photo.month)
-    return year, month
+    photo = photo.replace(extension, ' (no exif)' + extension)
+    new_name_photo = os.path.join(adress, photo)
+    os.rename(full_path_photo, new_name_photo)
+    log.write(full_path_photo + ' renamed in ' + new_name_photo + '\n')
+    return year, month, new_name_photo, photo
 
 path_in_dir = ''
 hash_list = []
@@ -79,9 +83,9 @@ for adress, dirs, files in os.walk(path_in_dir):
                         year_photo = data_photo[0:4]
                         month_photo = data_photo[5:7]
                     else:
-                        year_photo, month_photo = gettime()        
+                        year_photo, month_photo, full_path_photo, photo = no_exif(photo)        
                 else:
-                    year_photo, month_photo = gettime()
+                    year_photo, month_photo, full_path_photo, photo = no_exif(photo)
 
                 new_adress = os.path.join(path_out_dir, year_photo, month_photo)
                 md(new_adress)
