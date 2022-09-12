@@ -3,8 +3,6 @@ import datetime
 import hashlib 
 import shutil
 from exif import Image
-import reverse_geocoder as rg
-import pycountry
 
 def md(path):
     if os.path.exists(path) == False:
@@ -18,19 +16,6 @@ def calend(data_photo):
     month = data_photo.strftime("%m")
     year = data_photo.strftime("%Y")
     return year, month, day
-
-# def format_dms_coordinates(coordinates):
-#     return f"{coordinates[0]}° {coordinates[1]}\' {coordinates[2]}\""    
-
-# def dms_coordinates_to_dd_coordinates(coordinates, coordinates_ref):
-#     decimal_degrees = coordinates[0] + \
-#                       coordinates[1] / 60 + \
-#                       coordinates[2] / 3600
-    
-#     if coordinates_ref == "S" or coordinates_ref == "W":
-#         decimal_degrees = -decimal_degrees
-    
-#     return decimal_degrees
 
 path_in_dir = ''
 hash_list = []
@@ -91,13 +76,6 @@ for adress, dirs, files in os.walk(path_in_dir):
                 if images.has_exif and images.get('datetime_original', default='none') != 'none':
                     data_photo = datetime.datetime.strptime(images.datetime_original, r'%Y:%m:%d %H:%M:%S')
                     year_photo, month_photo, day_photo = calend(data_photo)
-
-                    # #Определяем геолокацию
-                    # decimal_latitude = dms_coordinates_to_dd_coordinates(images.gps_latitude, images.gps_latitude_ref)
-                    # decimal_longitude = dms_coordinates_to_dd_coordinates(images.gps_longitude, images.gps_longitude_ref)
-                    # coordinates = (decimal_latitude, decimal_longitude)
-                    # location_info = rg.search(coordinates)[0]
-                    # location_info['country'] = pycountry.countries.get(alpha_2=location_info['cc'])
 
                 else:
                     data_photo = datetime.datetime.fromtimestamp(os.path.getmtime(full_path_photo))

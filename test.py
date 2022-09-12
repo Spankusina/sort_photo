@@ -21,5 +21,5 @@ import reverse_geocoder as rg
 # decimal_latitude = dms_coordinates_to_dd_coordinates(images.gps_latitude, images.gps_latitude_ref)
 # decimal_longitude = dms_coordinates_to_dd_coordinates(images.gps_longitude, images.gps_longitude_ref)
 coordinates = (51.5214588,-0.1729636),(9.936033, 76.259952),(37.38605,-122.08385)
-rg.search(coordinates)
+l = rg.search(coordinates)
 # location_info['country'] = pycountry.countries.get(alpha_2=location_info['cc'])
