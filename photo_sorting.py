@@ -3,23 +3,34 @@ import datetime
 import hashlib 
 import shutil
 from exif import Image
+import reverse_geocoder as rg
+import pycountry
 
 def md(path):
     if os.path.exists(path) == False:
         os.makedirs(path)
 
-def no_exif(photo):
-    data_photo = datetime.datetime.fromtimestamp(os.path.getmtime(full_path_photo))
-    year = str(data_photo.year)
-    if data_photo.month < 10:
-        month = '0' + str(data_photo.month)
-    else:
-        month = str(data_photo.month)
-    photo = photo.replace(extension, ' (no exif)' + extension)
-    new_name_photo = os.path.join(adress, photo)
-    os.rename(full_path_photo, new_name_photo)
-    log.write(full_path_photo + ' renamed in ' + new_name_photo + '\n')
-    return year, month, new_name_photo, photo
+def calend(data_photo):
+    hour = data_photo.strftime("%H")
+    if int(hour) < 7:
+        data_photo = data_photo - datetime.timedelta(days=1)
+    day = data_photo.strftime(r"%d")
+    month = data_photo.strftime("%m")
+    year = data_photo.strftime("%Y")
+    return year, month, day
+
+# def format_dms_coordinates(coordinates):
+#     return f"{coordinates[0]}° {coordinates[1]}\' {coordinates[2]}\""    
+
+# def dms_coordinates_to_dd_coordinates(coordinates, coordinates_ref):
+#     decimal_degrees = coordinates[0] + \
+#                       coordinates[1] / 60 + \
+#                       coordinates[2] / 3600
+    
+#     if coordinates_ref == "S" or coordinates_ref == "W":
+#         decimal_degrees = -decimal_degrees
+    
+#     return decimal_degrees
 
 path_in_dir = ''
 hash_list = []
@@ -77,17 +88,28 @@ for adress, dirs, files in os.walk(path_in_dir):
                     images = Image(palm_file)
 
 
-                if images.has_exif:
-                    if images.get('datetime_original', default='none') != 'none':
-                        data_photo = images.datetime_original
-                        year_photo = data_photo[0:4]
-                        month_photo = data_photo[5:7]
-                    else:
-                        year_photo, month_photo, full_path_photo, photo = no_exif(photo)        
-                else:
-                    year_photo, month_photo, full_path_photo, photo = no_exif(photo)
+                if images.has_exif and images.get('datetime_original', default='none') != 'none':
+                    data_photo = datetime.datetime.strptime(images.datetime_original, r'%Y:%m:%d %H:%M:%S')
+                    year_photo, month_photo, day_photo = calend(data_photo)
 
-                new_adress = os.path.join(path_out_dir, year_photo, month_photo)
+                    # #Определяем геолокацию
+                    # decimal_latitude = dms_coordinates_to_dd_coordinates(images.gps_latitude, images.gps_latitude_ref)
+                    # decimal_longitude = dms_coordinates_to_dd_coordinates(images.gps_longitude, images.gps_longitude_ref)
+                    # coordinates = (decimal_latitude, decimal_longitude)
+                    # location_info = rg.search(coordinates)[0]
+                    # location_info['country'] = pycountry.countries.get(alpha_2=location_info['cc'])
+
+                else:
+                    data_photo = datetime.datetime.fromtimestamp(os.path.getmtime(full_path_photo))
+                    year_photo, month_photo, day_photo = calend(data_photo) 
+                    photo = photo.replace(extension, ' (no exif)' + extension)
+                    new_name_photo = os.path.join(adress, photo)
+                    os.rename(full_path_photo, new_name_photo)
+                    log.write(full_path_photo + ' renamed in ' + new_name_photo + '\n')
+                    full_path_photo = new_name_photo
+
+
+                new_adress = os.path.join(path_out_dir, year_photo, month_photo, day_photo)
                 md(new_adress)
 
                 #Если есть хеш фотографии в списке, тогда меняем название
