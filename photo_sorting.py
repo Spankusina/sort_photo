@@ -13,7 +13,7 @@ def calend(data_photo):
     if int(hour) < 7:
         data_photo = data_photo - datetime.timedelta(days=1)
     day = data_photo.strftime(r"%d")
-    month = data_photo.strftime("%m")
+    month = f'{data_photo.strftime("%m")} - {data_photo.strftime("%B")}'
     year = data_photo.strftime("%Y")
     return year, month, day
 
