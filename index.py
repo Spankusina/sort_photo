@@ -36,7 +36,7 @@ def do_it():
 window = tk.Tk()
 window.geometry('800x300')
 window.resizable(height=False, width=False)
-
+window.title('Сортировка фотографий')
 
 frm1 = tk.Frame(master=window, relief=tk.GROOVE, borderwidth=1, width=800, height=100)
 frm1.pack()
