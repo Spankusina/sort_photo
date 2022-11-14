@@ -52,7 +52,7 @@ frm2 = tk.Frame(master=window, relief=tk.GROOVE, borderwidth=1, width=800, heigh
 frm2.pack()
 btn2 = tk.Button(master=frm2, width=10, height=5, text='Выбрать', bg='light grey', command=open_dir_out)
 btn2.place(x = 45, rely = 0.5, anchor=tk.CENTER)
-lb2 = tk.Label(master=frm2, text='Куда положить фотографии')
+lb2 = tk.Label(master=frm2, text='Куда положить фотографии:')
 lb2.place(relx = 0.55, rely = 0.2, anchor=tk.CENTER)
 lb2_dir = tk.Label(master=frm2, text='...')
 lb2_dir.place(relx = 0.55, rely = 0.7, anchor=tk.CENTER)
